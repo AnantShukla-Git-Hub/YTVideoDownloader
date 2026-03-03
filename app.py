@@ -11,21 +11,29 @@ CORS(app)
 # Use temporary folder for server-side downloads
 TEMP_FOLDER = tempfile.gettempdir()
 
-# Set FFmpeg path
-FFMPEG_PATH = r'C:\Users\anant\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin\ffmpeg.exe'
+# Set FFmpeg path - check if running on Render or locally
+if os.path.exists('/usr/bin/ffmpeg'):
+    FFMPEG_PATH = '/usr/bin/ffmpeg'  # Render/Linux
+elif os.path.exists(r'C:\Users\anant\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin\ffmpeg.exe'):
+    FFMPEG_PATH = r'C:\Users\anant\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin\ffmpeg.exe'  # Windows local
+else:
+    FFMPEG_PATH = None  # Will use system ffmpeg if available
 
 # Common yt-dlp options to bypass restrictions
 def get_ydl_opts(extra_opts=None):
     base_opts = {
         'quiet': True,
         'no_warnings': True,
-        'ffmpeg_location': FFMPEG_PATH,
         'extractor_args': {
             'youtube': {
                 'player_client': ['android', 'web'],
             }
         },
     }
+    
+    # Add FFmpeg location if available
+    if FFMPEG_PATH:
+        base_opts['ffmpeg_location'] = FFMPEG_PATH
     
     # Check if cookies.txt exists and use it
     cookies_file = os.path.join(os.path.dirname(__file__), 'cookies.txt')

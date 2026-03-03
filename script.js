@@ -33,6 +33,9 @@ async function fetchFormats() {
     hideElement('success');
     showElement('loading');
 
+    console.log('Fetching from:', `${API_URL}/formats`);
+    console.log('Video URL:', url);
+
     try {
         const response = await fetch(`${API_URL}/formats`, {
             method: 'POST',
@@ -40,7 +43,17 @@ async function fetchFormats() {
             body: JSON.stringify({ url })
         });
 
-        const data = await response.json();
+        console.log('Response status:', response.status);
+        const text = await response.text();
+        console.log('Response text:', text);
+        
+        let data;
+        
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            throw new Error(`Server error: ${text.substring(0, 200)}`);
+        }
 
         if (!response.ok) {
             throw new Error(data.error || 'Failed to fetch video info');
@@ -63,6 +76,7 @@ async function fetchFormats() {
         showElement('videoInfo');
 
     } catch (error) {
+        console.error('Error:', error);
         hideElement('loading');
         showError(error.message);
     }

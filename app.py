@@ -30,14 +30,20 @@ def get_ydl_opts(extra_opts=None):
         },
     }
     
-    # Only set ffmpeg if it exists
-    if FFMPEG_PATH and os.path.exists(FFMPEG_PATH):
-        base_opts['ffmpeg_location'] = FFMPEG_PATH
+    # Only set ffmpeg if path exists
+    try:
+        if FFMPEG_PATH and (os.path.isfile(FFMPEG_PATH) or FFMPEG_PATH == 'ffmpeg'):
+            base_opts['ffmpeg_location'] = FFMPEG_PATH
+    except:
+        pass
     
     # Check if cookies.txt exists and use it
-    cookies_file = os.path.join(os.path.dirname(__file__), 'cookies.txt')
-    if os.path.exists(cookies_file):
-        base_opts['cookiefile'] = cookies_file
+    try:
+        cookies_file = os.path.join(os.path.dirname(__file__), 'cookies.txt')
+        if os.path.exists(cookies_file):
+            base_opts['cookiefile'] = cookies_file
+    except:
+        pass
     
     if extra_opts:
         base_opts.update(extra_opts)
